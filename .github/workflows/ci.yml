@@ -27,7 +27,8 @@ jobs:
      
       - name: Build 
         run: |
-          sudo apt install tree
-          tree /
+          # sudo apt install tree
+          # tree /usr/
+          ls -al /usr/local/
           mkdir -p build
           cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -DCUB_TUNING_TYPE=$type -S $SourceDir -B $BuildDir
