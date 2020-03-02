@@ -18,4 +18,3 @@ jobs:
           sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
           chmod +x NVIDIA-Linux-x86_64-440.64.run 
           sudo ./NVIDIA-Linux-x86_64-440.64.run --dkms -s 
-          nvidia-smi
