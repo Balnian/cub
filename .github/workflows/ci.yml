@@ -5,6 +5,7 @@ jobs:
   Build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-18.04 , ubuntu-16.04]
         driver: [440.64]
