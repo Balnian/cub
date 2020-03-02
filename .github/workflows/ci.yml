@@ -16,5 +16,5 @@ jobs:
           wget http://us.download.nvidia.com/XFree86/Linux-x86_64/440.64/NVIDIA-Linux-x86_64-440.64.run 
           sudo apt-get install build-essential gcc-multilib dkms 
           chmod +x NVIDIA-Linux-x86_64-440.64.run 
-          sudo ./NVIDIA-Linux-x86_64-384.69.run --dkms -s 
+          sudo ./NVIDIA-Linux-x86_64-440.64.run --dkms -s 
           nvidia-smi
