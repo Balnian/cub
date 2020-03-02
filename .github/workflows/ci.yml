@@ -24,6 +24,7 @@ jobs:
           sudo apt-get install build-essential
           chmod +x cuda_${TK_PATH}_linux.run 
           sudo ./cuda_${TK_PATH}_linux.run --silent --toolkit 
+          nvcc -h
           # wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${{ matrix.driver }}/NVIDIA-Linux-x86_64-${{ matrix.driver }}.run 
           # sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
           # chmod +x NVIDIA-Linux-x86_64-440.64.run 
