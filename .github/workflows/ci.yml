@@ -8,13 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04 , ubuntu-16.04]
-        driver: [440.64]
         toolkit: [10.1.105_418.39]
     steps:
-      - uses: actions/checkout@v2
         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
-      - name: Install Driver
+      - name: Install Toolkit
         run: |
           TK_PATH="${{ matrix.toolkit }}"
           TK_VERSION="${TK_PATH:0:4}"
@@ -24,8 +22,12 @@ jobs:
           sudo apt-get install build-essential
           chmod +x cuda_${TK_PATH}_linux.run 
           sudo ./cuda_${TK_PATH}_linux.run --silent --toolkit 
-          nvcc -h
-          # wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${{ matrix.driver }}/NVIDIA-Linux-x86_64-${{ matrix.driver }}.run 
-          # sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
-          # chmod +x NVIDIA-Linux-x86_64-440.64.run 
-          # sudo ./NVIDIA-Linux-x86_64-440.64.run --dkms -s 
+          
+      - uses: actions/checkout@v2
+     
+      - name: Build 
+        run: |
+          sudo apt install tree
+          tree /
+          mkdir -p build
+          cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -DCUB_TUNING_TYPE=$type -S $SourceDir -B $BuildDir
