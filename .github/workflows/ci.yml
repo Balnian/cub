@@ -16,8 +16,10 @@ jobs:
         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
       - name: Install Driver
         run: |
-          echo "Toolkit path: ${{ matrix.toolkit }}"
-          echo "Toolkit version: ${{ matrix.toolkit }:0:4}"
+          TK_PATH = "${{ matrix.toolkit }}"
+          TK_VERSION = "${TK_PATH:0:4}"
+          echo "Toolkit path: $TK_PATH"
+          echo "Toolkit version: $TK_VERSION"
           # wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${{ matrix.driver }}/NVIDIA-Linux-x86_64-${{ matrix.driver }}.run 
           # sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
           # chmod +x NVIDIA-Linux-x86_64-440.64.run 
