@@ -20,7 +20,7 @@ jobs:
           TK_VERSION="${TK_PATH:0:4}"
           echo "Toolkit path: $TK_PATH"
           echo "Toolkit version: $TK_VERSION"
-          wget https://developer.nvidia.com/compute/cuda/$TK_VERSION/Prod/local_installers/cuda_$TK_PATH_linux.run
+          wget https://developer.nvidia.com/compute/cuda/${TK_VERSION}/Prod/local_installers/cuda_${TK_PATH}_linux.run
           sudo apt-get install build-essential
           chmod +x cuda_$TK_PATH_linux.run 
           sudo ./cuda_$TK_PATH_linux.run --silent --toolkit 
