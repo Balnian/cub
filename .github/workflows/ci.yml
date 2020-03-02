@@ -10,9 +10,16 @@ jobs:
         os: [ubuntu-18.04 , ubuntu-16.04]
         toolkit: [10.1.105_418.39]
     steps:
+      - name: Cache Toolkit
+        id: cacheTK
+        uses: actions/cache@v1
+        with:
+          path: /usr/local/cuda/
+          key: ${{ runner.os }}-${{ matrix.toolkit }}
         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
       - name: Install Toolkit
+        if: steps.cacheTK.outputs.cache-hit != 'true'
         run: |
           TK_PATH="${{ matrix.toolkit }}"
           TK_VERSION="${TK_PATH:0:4}"
@@ -31,4 +38,4 @@ jobs:
           # tree /usr/
           ls -al /usr/local/
           mkdir -p build
-          cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -DCUB_TUNING_TYPE=$type -S $SourceDir -B $BuildDir
+          cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
