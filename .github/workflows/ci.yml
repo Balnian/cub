@@ -9,12 +9,16 @@ jobs:
       matrix:
         os: [ubuntu-18.04 , ubuntu-16.04]
         driver: [440.64]
+        toolkit: [10.1.105_418.39]
     steps:
       - uses: actions/checkout@v2
         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
+        # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
       - name: Install Driver
         run: |
-          wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${{ matrix.driver }}/NVIDIA-Linux-x86_64-${{ matrix.driver }}.run 
-          sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
-          chmod +x NVIDIA-Linux-x86_64-440.64.run 
-          sudo ./NVIDIA-Linux-x86_64-440.64.run --dkms -s 
+          echo "Toolkit path: ${{ matrix.toolkit }}"
+          echo "Toolkit version: ${{ matrix.toolkit }:0:4}"
+          # wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${{ matrix.driver }}/NVIDIA-Linux-x86_64-${{ matrix.driver }}.run 
+          # sudo apt-get install build-essential gcc-multilib dkms xorg xorg-dev
+          # chmod +x NVIDIA-Linux-x86_64-440.64.run 
+          # sudo ./NVIDIA-Linux-x86_64-440.64.run --dkms -s 
