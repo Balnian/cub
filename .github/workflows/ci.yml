@@ -39,3 +39,11 @@ jobs:
           ls -al /usr/local/
           mkdir -p build
           cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
+          cmake --build build/ --parallel
+        
+      - name: Upload Build Artifact
+        if: success()
+        uses: actions/upload-artifact@v1
+        with:
+          name: Binaries-${{ matrix.os }}-${{ matrix.toolkit }}
+          path: build/
