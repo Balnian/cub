@@ -19,7 +19,7 @@ jobs:
         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
       - name: Install Toolkit
-        if: steps.cacheTK.outputs.cache-hit != 'true'
+        #if: steps.cacheTK.outputs.cache-hit != 'true'
         run: |
           TK_PATH="${{ matrix.toolkit }}"
           TK_VERSION="${TK_PATH:0:4}"
