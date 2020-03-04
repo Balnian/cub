@@ -32,7 +32,7 @@
  */
 
 #pragma once
-
+#include <iterator>
 #include "../util_namespace.cuh"
 
 /// Optional outer namespace(s)

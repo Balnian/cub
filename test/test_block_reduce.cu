@@ -415,6 +415,10 @@ void TestFullTile(
 /**
  * Test full-tile reduction.
  */
+#ifndef TEST_ARCH
+    #define TEST_ARCH CUB_PTX_ARCH
+#endif
+
 template <
     BlockReduceAlgorithm    ALGORITHM,
     int                     BLOCK_DIM_X,

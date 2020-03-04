@@ -271,7 +271,7 @@ endforeach ()
 
 # Handle examples.
 
-list(APPEND CUB_EXAMPLE_GLOBS examples/*.cu)
+list(APPEND CUB_EXAMPLE_GLOBS examples/example_*.cu)
 
 if (CMAKE_VERSION VERSION_LESS 3.12)
   file(
