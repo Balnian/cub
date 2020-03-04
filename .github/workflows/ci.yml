@@ -18,6 +18,9 @@ jobs:
           # key: ${{ runner.os }}-${{ matrix.toolkit }}
         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
+        # Toolkit Windows flags: https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html#install-cuda-software  
+        #                        https://devtalk.nvidia.com/default/topic/984735/windows-cuda-toolkit-silent-installation-/
+        # Toolkit Mac install flags: https://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#install
       - name: Install Toolkit
         #if: steps.cacheTK.outputs.cache-hit != 'true'
         run: |
