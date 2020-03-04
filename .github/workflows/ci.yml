@@ -2,7 +2,7 @@ name: CI
 
 on: [push]
 jobs:
-  Build Linux:
+  Build_Linux:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,7 +52,7 @@ jobs:
           path: build/
           
       
-  Build Windows:
+  Build_Windows:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
