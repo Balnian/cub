@@ -89,16 +89,12 @@ jobs:
               "macOS"= @{}
           }
           $OS = "${{ runner.os }}"
-          $ToolkitVersion = "${TK_VERSION}"
+          $ToolkitVersion = "${{ matrix.toolkit }}"
           $ToolkitInstallerName = "TK_installer"
 
           if ($OS -eq "Windows") {
               $ToolkitInstallerName += ".exe"
           }
-
-          # $ToolkitInstallerName
-
-          $Toolkits.$OS
 
           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
 
