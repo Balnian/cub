@@ -88,7 +88,6 @@ jobs:
               };
               "macOS"= @{}
           }
-          $Toolkits
           $OS = "${{ runner.os }}"
           $ToolkitVersion = "${TK_VERSION}"
           $ToolkitInstallerName = "TK_installer"
@@ -99,7 +98,7 @@ jobs:
 
           # $ToolkitInstallerName
 
-          $Toolkits.$OS.$ToolkitVersion
+          $Toolkits.$OS
 
           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
 
