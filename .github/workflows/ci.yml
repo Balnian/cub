@@ -2,13 +2,14 @@ name: CI
 
 on: [push]
 jobs:
-  Build_Linux:
+  Build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04 , ubuntu-16.04]
-        toolkit: [10.1.105_418.39, 10.2.89_440.33.01]
+        os: [ubuntu-18.04 , ubuntu-16.04, windows-latest]
+        toolkit: [10.2]
+#         toolkit: [10.1.105_418.39, 10.2.89_440.33.01]
     steps:
       # - name: Cache Toolkit
         # id: cacheTK
@@ -21,17 +22,48 @@ jobs:
         # Toolkit Windows flags: https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html#install-cuda-software  
         #                        https://devtalk.nvidia.com/default/topic/984735/windows-cuda-toolkit-silent-installation-/
         # Toolkit Mac install flags: https://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#install
-      - name: Install Toolkit
+
+- name: Install Toolkit
+        shell: pwsh
         #if: steps.cacheTK.outputs.cache-hit != 'true'
         run: |
-          TK_PATH="${{ matrix.toolkit }}"
-          TK_VERSION="${TK_PATH:0:4}"
-          echo "Toolkit path: $TK_PATH"
-          echo "Toolkit version: $TK_VERSION"
-          wget https://developer.nvidia.com/compute/cuda/${TK_VERSION}/Prod/local_installers/cuda_${TK_PATH}_linux.run
-          sudo apt-get install build-essential
-          chmod +x cuda_${TK_PATH}_linux.run 
-          sudo ./cuda_${TK_PATH}_linux.run --silent --toolkit 
+          $Toolkits = @{
+              "Linux"= @{
+                  "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run";
+                  "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run";
+                  "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux"
+              };
+              "Windows"= @{
+                  "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_win10.exe";
+                  "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe";
+                  "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10"
+              };
+              "macOS"= @{}
+          }
+          $OS = "${{ runner.os }}"
+          $ToolkitVersion = "${{ matrix.toolkit }}"
+          $ToolkitInstallerName = "TK_installer"
+          if ($OS -eq "Windows") {
+              $ToolkitInstallerName += ".exe"
+          }
+          Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
+          Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
+          if ($OS -eq "Linux") {
+              .\$ToolkitInstallerName --silent --toolkit
+          } elseif ($OS -eq "Windows") {
+              Start-Process -FilePath $ToolkitInstallerName -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
+          }
+#       - name: Install Toolkit
+        #if: steps.cacheTK.outputs.cache-hit != 'true'
+#         run: |
+#           TK_PATH="${{ matrix.toolkit }}"
+#           TK_VERSION="${TK_PATH:0:4}"
+#           echo "Toolkit path: $TK_PATH"
+#           echo "Toolkit version: $TK_VERSION"
+#           wget https://developer.nvidia.com/compute/cuda/${TK_VERSION}/Prod/local_installers/cuda_${TK_PATH}_linux.run
+#           sudo apt-get install build-essential
+#           chmod +x cuda_${TK_PATH}_linux.run 
+#           sudo ./cuda_${TK_PATH}_linux.run --silent --toolkit 
           
       - uses: actions/checkout@v2
      
@@ -52,75 +84,75 @@ jobs:
           path: build/
           
       
-  Build_Windows:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest]
-        toolkit: [10.2]
-    steps:
-      # - name: Cache Toolkit
-        # id: cacheTK
-        # uses: actions/cache@v1
-       #  with:
-          # path: /usr/local/cuda/
-          # key: ${{ runner.os }}-${{ matrix.toolkit }}
-        # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
-        # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
-        # Toolkit Windows flags: https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html#install-cuda-software  
-        #                        https://devtalk.nvidia.com/default/topic/984735/windows-cuda-toolkit-silent-installation-/
-        # Toolkit Mac install flags: https://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#install
-      - name: Install Toolkit
-        shell: pwsh
-        #if: steps.cacheTK.outputs.cache-hit != 'true'
-        run: |
-          $Toolkits = @{
-              "Linux"= @{
-                  "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run";
-                  "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run";
-                  "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux"
-              };
-              "Windows"= @{
-                  "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_win10.exe";
-                  "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe";
-                  "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10"
-              };
-              "macOS"= @{}
-          }
-          $OS = "${{ runner.os }}"
-          $ToolkitVersion = "${{ matrix.toolkit }}"
-          $ToolkitInstallerName = "TK_installer"
+#   Build_Windows:
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: [windows-latest]
+#         toolkit: [10.2]
+#     steps:
+#       # - name: Cache Toolkit
+#         # id: cacheTK
+#         # uses: actions/cache@v1
+#        #  with:
+#           # path: /usr/local/cuda/
+#           # key: ${{ runner.os }}-${{ matrix.toolkit }}
+#         # Driver Install instructions: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-runfile
+#         # Toolkit Runfile flags: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-advanced
+#         # Toolkit Windows flags: https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html#install-cuda-software  
+#         #                        https://devtalk.nvidia.com/default/topic/984735/windows-cuda-toolkit-silent-installation-/
+#         # Toolkit Mac install flags: https://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#install
+#       - name: Install Toolkit
+#         shell: pwsh
+#         #if: steps.cacheTK.outputs.cache-hit != 'true'
+#         run: |
+#           $Toolkits = @{
+#               "Linux"= @{
+#                   "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run";
+#                   "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run";
+#                   "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux"
+#               };
+#               "Windows"= @{
+#                   "10.2" = "http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_win10.exe";
+#                   "10.1" = "http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_426.00_win10.exe";
+#                   "10.0" = "https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_411.31_win10"
+#               };
+#               "macOS"= @{}
+#           }
+#           $OS = "${{ runner.os }}"
+#           $ToolkitVersion = "${{ matrix.toolkit }}"
+#           $ToolkitInstallerName = "TK_installer"
 
-          if ($OS -eq "Windows") {
-              $ToolkitInstallerName += ".exe"
-          }
+#           if ($OS -eq "Windows") {
+#               $ToolkitInstallerName += ".exe"
+#           }
 
-          Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
+#           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
 
-          Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
+#           Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
 
-          if ($OS -eq "Linux") {
-              .\$ToolkitInstallerName --silent --toolkit
-          } elseif ($OS -eq "Windows") {
-              Start-Process -FilePath $ToolkitInstallerName -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
-          }
+#           if ($OS -eq "Linux") {
+#               .\$ToolkitInstallerName --silent --toolkit
+#           } elseif ($OS -eq "Windows") {
+#               Start-Process -FilePath $ToolkitInstallerName -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
+#           }
           
-      - uses: actions/checkout@v2
+#       - uses: actions/checkout@v2
      
-      - name: Build 
-        shell: bash
-        run: |
-          # sudo apt install tree
-          # tree /usr/
-          echo Running -j "$(getconf _NPROCESSORS_ONLN)"
-          mkdir -p build
-          cmake -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v${{ matrix.toolkit }}" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v${{ matrix.toolkit }}/bin/nvcc" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
-          cmake --build build/ -j "$(getconf _NPROCESSORS_ONLN)"
+#       - name: Build 
+#         shell: bash
+#         run: |
+#           # sudo apt install tree
+#           # tree /usr/
+#           echo Running -j "$(getconf _NPROCESSORS_ONLN)"
+#           mkdir -p build
+#           cmake -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v${{ matrix.toolkit }}" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v${{ matrix.toolkit }}/bin/nvcc" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
+#           cmake --build build/ -j "$(getconf _NPROCESSORS_ONLN)"
         
-      - name: Upload Build Artifact
-        if: success()
-        uses: actions/upload-artifact@v1
-        with:
-          name: Binaries-${{ matrix.os }}-${{ matrix.toolkit }}
-          path: build/
+#       - name: Upload Build Artifact
+#         if: success()
+#         uses: actions/upload-artifact@v1
+#         with:
+#           name: Binaries-${{ matrix.os }}-${{ matrix.toolkit }}
+#           path: build/
