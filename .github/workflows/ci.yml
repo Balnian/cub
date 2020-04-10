@@ -49,10 +49,10 @@ jobs:
           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
           Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
           if ($OS -eq "Linux") {
-              #Start-Process -FilePath "sudo $ToolkitInstallerName" -ArgumentList "--silent --toolkit" -Wait -NoNewWindow
-              sudo ./$ToolkitInstallerName --silent --toolkit
+              Start-Process -FilePath "sudo $ToolkitInstallerName" -verb runAs -ArgumentList "--silent --toolkit" -Wait -NoNewWindow
+              #sudo ./$ToolkitInstallerName --silent --toolkit
           } elseif ($OS -eq "Windows") {
-              Start-Process -FilePath $ToolkitInstallerName -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
+              Start-Process -FilePath $ToolkitInstallerName -verb runAs -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
           }
 #       - name: Install Toolkit
         #if: steps.cacheTK.outputs.cache-hit != 'true'
