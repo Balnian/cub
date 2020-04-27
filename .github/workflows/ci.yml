@@ -40,19 +40,35 @@ jobs:
               };
               "macOS"= @{}
           }
+          
           $OS = "${{ runner.os }}"
           $ToolkitVersion = "${{ matrix.toolkit }}"
           $ToolkitInstallerName = "TK_installer"
           if ($OS -eq "Windows") {
               $ToolkitInstallerName += ".exe"
           }
+          
+          $CudaFeatures = 'nvcc_$ToolkitVersion cuobjdump_$ToolkitVersion nvprune_$ToolkitVersion cupti_$ToolkitVersion gpu_library_advisor_$ToolkitVersion memcheck_$ToolkitVersion ' + `
+            'nvdisasm_$ToolkitVersion nvprof_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion ' + `
+            'cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion ' + `
+            'cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion ' + `
+            'occupancy_calculator_$ToolkitVersion fortran_examples_$ToolkitVersion'
+          
           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
           Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
           if ($OS -eq "Linux") {
               Start-Process -FilePath $ToolkitInstallerName -Verb RunAs -ArgumentList "--silent --toolkit" -Wait -NoNewWindow
               #sudo ./$ToolkitInstallerName --silent --toolkit
           } elseif ($OS -eq "Windows") {
-              Start-Process -FilePath $ToolkitInstallerName -Verb RunAs -ArgumentList "-s compiler_$ToolkitVersion command_line_tools_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion demo_suite_$ToolkitVersion documentation_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion occupancy_calculator_$ToolkitVersion" -Wait -NoNewWindow
+              $proc = Start-Process -FilePath $ToolkitInstallerName -Verb RunAs -ArgumentList @('-s ' + $CudaFeatures) -Wait -PassThru
+              $exitCode = $proc.ExitCode
+              if ($exitCode -eq 0) {
+                Write-Output 'Installation successful!'
+              }
+              else {
+                Write-Output "Installation failed! Exited with $exitCode."
+                exit $exitCode
+              }
           }
 #       - name: Install Toolkit
         #if: steps.cacheTK.outputs.cache-hit != 'true'
