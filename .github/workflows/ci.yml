@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04 , ubuntu-16.04, windows-latest]
-        toolkit: [10.2]
+        toolkit: [10.1]
 #         toolkit: [10.1.105_418.39, 10.2.89_440.33.01]
     steps:
       # - name: Cache Toolkit
@@ -48,11 +48,11 @@ jobs:
               $ToolkitInstallerName += ".exe"
           }
           
-          $CudaFeatures = 'nvcc_$ToolkitVersion cuobjdump_$ToolkitVersion nvprune_$ToolkitVersion cupti_$ToolkitVersion gpu_library_advisor_$ToolkitVersion memcheck_$ToolkitVersion ' + `
-            'nvdisasm_$ToolkitVersion nvprof_$ToolkitVersion visual_profiler_$ToolkitVersion visual_studio_integration_$ToolkitVersion cublas_$ToolkitVersion cublas_dev_$ToolkitVersion ' + `
-            'cudart_$ToolkitVersion cufft_$ToolkitVersion cufft_dev_$ToolkitVersion curand_$ToolkitVersion curand_dev_$ToolkitVersion cusolver_$ToolkitVersion cusolver_dev_$ToolkitVersion cusparse_$ToolkitVersion ' + `
-            'cusparse_dev_$ToolkitVersion nvgraph_$ToolkitVersion nvgraph_dev_$ToolkitVersion npp_$ToolkitVersion npp_dev_$ToolkitVersion nvrtc_$ToolkitVersion nvrtc_dev_$ToolkitVersion nvml_dev_$ToolkitVersion ' + `
-            'occupancy_calculator_$ToolkitVersion fortran_examples_$ToolkitVersion'
+          $CudaFeatures = 'nvcc_10.1 cuobjdump_10.1 nvprune_10.1 cupti_10.1 gpu_library_advisor_10.1 memcheck_10.1 ' + `
+            'nvdisasm_10.1 nvprof_10.1 visual_profiler_10.1 visual_studio_integration_10.1 cublas_10.1 cublas_dev_10.1 ' + `
+            'cudart_10.1 cufft_10.1 cufft_dev_10.1 curand_10.1 curand_dev_10.1 cusolver_10.1 cusolver_dev_10.1 cusparse_10.1 ' + `
+            'cusparse_dev_10.1 nvgraph_10.1 nvgraph_dev_10.1 npp_10.1 npp_dev_10.1 nvrtc_10.1 nvrtc_dev_10.1 nvml_dev_10.1 ' + `
+            'occupancy_calculator_10.1 fortran_examples_10.1'
           
           Write-Output "Installing toolkit $ToolkitVersion for $OS from $($Toolkits.$OS.$ToolkitVersion)"
           Invoke-WebRequest -Uri $Toolkits.$OS.$ToolkitVersion -OutFile $ToolkitInstallerName 
